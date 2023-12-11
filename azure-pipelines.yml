@@ -3,7 +3,8 @@ trigger:
 
 pool:
   name: 'Self Hosted Pool'
-  vmImage: 'ubuntu-20.04'
+  # vmImage: 'ubuntu-20.04'
+  vmImage: 'ubuntu-latest'
   demands:
   - npm
 
