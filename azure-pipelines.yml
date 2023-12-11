@@ -3,6 +3,9 @@ trigger:
 
 pool:
   name: 'Self Hosted Pool'
+  vmImage: 'ubuntu-20.04'
+  demands:
+  - npm
 
 variables:
   buildConfiguration: 'Release'
