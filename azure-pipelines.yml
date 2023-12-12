@@ -1,6 +1,9 @@
 trigger:
 - '*'
 
+variables:
+  buildConfiguration: 'Release'
+
 stages:
 - stage: 'Build'
   displayName: 'Build the web application'
@@ -14,7 +17,6 @@ stages:
       - npm
 
     variables:
-      buildConfiguration: 'Release'
       wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
       dotnetSdkVersion: '6.x'
 
@@ -56,11 +58,7 @@ stages:
 
     - template: templates/build.yml
       parameters:
-        buildConfiguration: 'Debug'
-
-    - template: templates/build.yml
-      parameters:
-        buildConfiguration: 'Release'
+        buildConfiguration: '$(buildConfiguration)'
 
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Artifact: drop'
