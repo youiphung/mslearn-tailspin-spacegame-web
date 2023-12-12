@@ -1,61 +1,67 @@
 trigger:
 - '*'
 
-pool:
-  name: 'Self Hosted Pool'
-  vmImage: 'ubuntu-latest'
-  demands:
-  - npm
+stages:
+- stage: 'Build'
+  displayName: 'Build the web application'
+  jobs: 
+  - job: 'Build'
+    displayName: 'Build job'
+    pool:
+      name: 'Self Hosted Pool'
+      vmImage: 'ubuntu-latest'
+      demands:
+      - npm
 
-variables:
-  buildConfiguration: 'Release'
-  wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
-  dotnetSdkVersion: '6.x'
+    variables:
+      buildConfiguration: 'Release'
+      wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
+      dotnetSdkVersion: '6.x'
 
-steps:
-- task: UseDotNet@2
-  displayName: 'Use .NET SDK $(dotnetSdkVersion)'
-  inputs:
-    version: '$(dotnetSdkVersion)'
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Use .NET SDK $(dotnetSdkVersion)'
+      inputs:
+        version: '$(dotnetSdkVersion)'
 
-- task: NuGetToolInstaller@0
-  inputs:
-    versionSpec: '5.9.1'
+    - task: NuGetToolInstaller@0
+      inputs:
+        versionSpec: '5.9.1'
 
-- task: Npm@1
-  displayName: 'Run npm install'
-  inputs:
-    verbose: false
+    - task: Npm@1
+      displayName: 'Run npm install'
+      inputs:
+        verbose: false
 
-- script: './node_modules/.bin/node-sass $(wwwrootDir) --output $(wwwrootDir)'
-  displayName: 'Compile Sass assets'
+    - script: './node_modules/.bin/node-sass $(wwwrootDir) --output $(wwwrootDir)'
+      displayName: 'Compile Sass assets'
 
-- task: gulp@1
-  inputs:
-    gulpFile: 'gulpfile.js'
-    gulpjs: 'node_modules/gulp/bin/gulp.js'
-  displayName: 'Run gulp tasks'
+    - task: gulp@1
+      inputs:
+        gulpFile: 'gulpfile.js'
+        gulpjs: 'node_modules/gulp/bin/gulp.js'
+      displayName: 'Run gulp tasks'
 
-- script: 'echo "$(Build.DefinitionName), $(Build.BuildId), $(Build.BuildNumber)" > buildinfo.txt'
-  displayName: 'Write build info'
-  workingDirectory: $(wwwrootDir)
+    - script: 'echo "$(Build.DefinitionName), $(Build.BuildId), $(Build.BuildNumber)" > buildinfo.txt'
+      displayName: 'Write build info'
+      workingDirectory: $(wwwrootDir)
 
-- task: NuGetCommand@2
-  displayName: 'Restore project dependencies'
-  inputs:
-    command: 'restore'
-    restoreSolution: '**/*.sln'
-    feedsToUse: 'select'
-    vstsFeed: '$(System.TeamProject)/Tailspin.SpaceGame.Web.Models'
+    - task: NuGetCommand@2
+      displayName: 'Restore project dependencies'
+      inputs:
+        command: 'restore'
+        restoreSolution: '**/*.sln'
+        feedsToUse: 'select'
+        vstsFeed: '$(System.TeamProject)/Tailspin.SpaceGame.Web.Models'
 
-- template: templates/build.yml
-  parameters:
-    buildConfiguration: 'Debug'
+    - template: templates/build.yml
+      parameters:
+        buildConfiguration: 'Debug'
 
-- template: templates/build.yml
-  parameters:
-    buildConfiguration: 'Release'
+    - template: templates/build.yml
+      parameters:
+        buildConfiguration: 'Release'
 
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: drop'
-  condition: succeeded()
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact: drop'
+      condition: succeeded()
