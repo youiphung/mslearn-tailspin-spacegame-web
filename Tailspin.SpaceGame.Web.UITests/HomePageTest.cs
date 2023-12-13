@@ -6,6 +6,8 @@ using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections;
+using System.IO;
+using System.Reflection;
 
 namespace UITests
 {
@@ -32,17 +34,17 @@ namespace UITests
                 {
                   case "Chrome":
                     driver = new ChromeDriver(
-                        Environment.GetEnvironmentVariable("ChromeWebDriver")
+                        Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
                     );
                     break;
                   case "Firefox":
                     driver = new FirefoxDriver(
-                        Environment.GetEnvironmentVariable("GeckoWebDriver")
+                        Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
                     );
-                    break;
+                        break;
                   case "Edge":
                     driver = new EdgeDriver(
-                        Environment.GetEnvironmentVariable("EdgeWebDriver"),
+                        Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                         new EdgeOptions
                         {
                             UseChromium = true
